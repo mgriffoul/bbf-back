@@ -1,10 +1,11 @@
 package com.griffoul.mathieu.bbfback.authentication.jwt.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +18,15 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     private Map<String, String> authorizedCredentials = getCredentials();
 
+    @Bean
+    public PasswordEncoder passwordEncoder2() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (authorizedCredentials.containsKey(username)) {
-            return new User(username, authorizedCredentials.get(username),
+            return new User(username, passwordEncoder2().encode(authorizedCredentials.get(username)),
                     new ArrayList<>());
         } else {
             throw new UsernameNotFoundException("User not found with username: " + username);
